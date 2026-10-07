@@ -318,22 +318,16 @@ class COLORGRID_OT_generate_grid(Operator):
                 
                 colors.append((r, g, b))
         
-        # Gérer la collection "tiles"
+        # Gérer la collection "tiles" - la créer si elle n'existe pas, sinon la récupérer
         collection_name = "tiles"
         collection = bpy.data.collections.get(collection_name)
         
-        if collection:
-            # Collection existe: supprimer tous les objets et la collection
-            for obj in list(collection.objects):
-                collection.objects.unlink(obj)
-                bpy.data.objects.remove(obj, do_unlink=True)
-            bpy.data.collections.remove(collection)
-            print(f"✅ Collection '{collection_name}' supprimée")
-        
-        # Recréer la collection "tiles"
-        collection = bpy.data.collections.new(collection_name)
-        bpy.context.scene.collection.children.link(collection)
-        print(f"✅ Collection '{collection_name}' recréée")
+        if not collection:
+            collection = bpy.data.collections.new(collection_name)
+            bpy.context.scene.collection.children.link(collection)
+            print(f"✅ Collection '{collection_name}' créée")
+        else:
+            print(f"✅ Collection '{collection_name}' récupérée")
         
         # Supprimer les anciens matériaux ColorTile_*
         for mat in list(bpy.data.materials):
@@ -385,8 +379,14 @@ class COLORGRID_OT_generate_grid(Operator):
         mesh.from_pydata(vertices, [], faces)
         mesh.update()
         
-        # Créer l'objet
-        obj = bpy.data.objects.new("ColorGrid", mesh)
+        # Créer l'objet avec un nom unique (incrémental)
+        grid_number = 1
+        grid_name = f"ColorGrid_{grid_number}"
+        while grid_name in bpy.data.objects:
+            grid_number += 1
+            grid_name = f"ColorGrid_{grid_number}"
+        
+        obj = bpy.data.objects.new(grid_name, mesh)
         collection.objects.link(obj)
         
         # Ajouter les vertex colors (domain CORNER pour interpolation aux sommets)
