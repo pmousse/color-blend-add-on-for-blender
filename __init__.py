@@ -431,6 +431,11 @@ class COLORGRID_OT_generate_grid(Operator):
         # Ajuster la caméra pour englober toute la grille
         _frame_selected_object(obj)
         
+        # Forcer le rafraîchissement des vues 3D
+        for area in bpy.context.screen.areas:
+            if area.type == 'VIEW_3D':
+                area.tag_redraw()
+        
         self.report({'INFO'}, f"Grille générée : {cols}x{rows} ({cols * rows} éléments)")
         return {'FINISHED'}
 
@@ -460,18 +465,22 @@ def _frame_selected_object(obj):
         scene.collection.objects.link(cam_obj)
         scene.camera = cam_obj
         camera = cam_obj
+        print("📷 Nouvelle caméra créée")
+    else:
+        print("📷 Caméra existante déplacée")
     
     # Positionner la caméra directement au-dessus (axe Z positif)
-    height = max_size * 1.5  # Hauteur avec marge
+    height = max_size * 1.5
     camera.location = (center.x, center.y, center.z + height)
     
-    # Faire regarder la caméra droit vers le bas (axe Z négatif)
-    camera.rotation_euler = (-1.5708, 0.0, 0.0)  # -90 degrés en radians
+    # Faire regarder la caméra droit vers le bas
+    camera.rotation_euler = (-1.5708, 0.0, 0.0)
     
-    # Ajuster le champ de vision pour tout englober
-    camera.data.lens = 35  # Grand angle pour voir toute la grille
+    # Ajuster le champ de vision
+    camera.data.lens = 35
     
-    print(f"📷 Caméra top-down placée (hauteur: {height:.2f}m, centre: {center.x:.2f}, {center.y:.2f})")
+    print(f"📷 Position: {camera.location.x:.2f}, {camera.location.y:.2f}, {camera.location.z:.2f}")
+    print(f"📷 Rotation: {camera.rotation_euler[0]:.2f}, {camera.rotation_euler[1]:.2f}, {camera.rotation_euler[2]:.2f}")
     
     print(f"📷 Caméra placée au-dessus de la grille (hauteur: {height:.2f}m)")
 
