@@ -364,9 +364,9 @@ class COLORGRID_OT_generate_grid(Operator):
                 x = start_x + col * props.spacing
                 y = start_y - row * props.spacing
                 
-                # 4 coins de la tuile (espaces égaux à la taille des tuiles)
-                # spacing = taille tuile + espace, donc tile_size = spacing / 2
-                tile_size = props.spacing / 2.0
+                # 4 coins de la tuile
+                # spacing = 1 → tuiles collées, spacing > 1 → espace entre les tuiles
+                tile_size = 1.0
                 half = tile_size / 2.0
                 v0 = (x - half, y - half, 0)  # bas gauche
                 v1 = (x + half, y - half, 0)  # bas droite
@@ -452,10 +452,10 @@ def _frame_selected_object(obj, cols, rows, spacing):
     scene = bpy.context.scene
     
     # Calculer la taille de la grille directement à partir des paramètres
-    # Chaque tuile a une taille = spacing, et elles sont espacées de spacing
-    # Taille totale = nombre * spacing (car les tuiles se touchent)
-    x_size = cols * spacing
-    y_size = rows * spacing
+    # Chaque tuile a une taille fixe = 1.0, et elles sont espacées de (spacing - 1.0)
+    # Position totale = (cols - 1) * spacing + 1.0 (pour la tuile elle-même)
+    x_size = (cols - 1) * spacing + 1.0
+    y_size = (rows - 1) * spacing + 1.0
     max_size = max(x_size, y_size)
     
     # Obtenir le centre de l'objet
