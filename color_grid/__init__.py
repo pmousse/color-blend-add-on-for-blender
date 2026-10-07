@@ -440,30 +440,40 @@ class COLORGRID_OT_generate_grid(Operator):
 # ============================================================================
 
 def _frame_selected_object(obj):
-    """Ajuster la caméra pour cadrer l'objet sélectionné"""
+    """Placer la caméra au-dessus de l'objet et regarder vers le bas"""
     scene = bpy.context.scene
-    camera = scene.camera
     
+    # Obtenir les dimensions de l'objet
+    obj.update_from_shape_keys()
+    obj_bbox = obj.bound_box
+    center = obj.location
+    
+    # Calculer la taille de la grille
+    x_size = abs(obj_bbox[6].x - obj_bbox[0].x)
+    y_size = abs(obj_bbox[6].y - obj_bbox[0].y)
+    max_size = max(x_size, y_size)
+    
+    # Créer ou récupérer la caméra
+    camera = scene.camera
     if not camera:
-        # Créer une caméra si elle n'existe pas
-        cam_data = bpy.data.cameras.new("Camera")
-        cam_obj = bpy.data.objects.new("Camera", cam_data)
+        cam_data = bpy.data.cameras.new("ColorGridCamera")
+        cam_obj = bpy.data.objects.new("ColorGridCamera", cam_data)
         scene.collection.objects.link(cam_obj)
         scene.camera = cam_obj
         camera = cam_obj
     
-    # Sélectionner l'objet
-    bpy.context.view_layer.objects.active = obj
-    obj.select_set(True)
+    # Positionner la caméra au-dessus (vue top-down)
+    height = max_size * 1.2  # Hauteur avec marge
+    camera.location = (center.x, center.y, center.z + height)
     
-    # Deselect all others
-    for o in bpy.context.scene.collection.objects:
-        if o != obj:
-            o.select_set(False)
+    # Faire regarder la caméra vers le bas (vers le centre)
+    rotation_x = -90.0 * (3.14159265359 / 180.0)  # -90 degrés en radians
+    camera.rotation_euler = (rotation_x, 0.0, 0.0)
     
-    # Framing
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.view3d.frame_selected(all=False)
+    # Ajuster le champ de vision
+    camera.data.lens = 50  # Angle de vue
+    
+    print(f"📷 Caméra placée au-dessus de la grille (hauteur: {height:.2f}m)")
 
 
 # ============================================================================
