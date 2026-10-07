@@ -430,7 +430,7 @@ class COLORGRID_OT_generate_grid(Operator):
         print(f"✅ Grille créée avec succès: {len(faces)} tuiles dans 1 objet")
         
         # Ajuster la caméra pour englober toute la grille
-        _frame_selected_object(obj)
+        _frame_selected_object(obj, cols, rows, props.spacing)
         
         # Forcer le rafraîchissement des vues 3D
         for area in bpy.context.screen.areas:
@@ -445,36 +445,19 @@ class COLORGRID_OT_generate_grid(Operator):
 # FONCTIONS UTILITAIRES
 # ============================================================================
 
-def _frame_selected_object(obj):
+def _frame_selected_object(obj, cols, rows, spacing):
     """Placer la caméra au-dessus de l'objet et regarder vers le bas"""
     scene = bpy.context.scene
     
+    # Calculer la taille de la grille directement à partir des paramètres
+    total_width = (cols - 1) * spacing
+    total_height = (rows - 1) * spacing
+    x_size = total_width + spacing  # Ajouter un spacing pour les demi-tuiles aux bords
+    y_size = total_height + spacing
+    max_size = max(x_size, y_size)
+    
     # Obtenir le centre de l'objet
     center = obj.location
-    
-    # Calculer la taille de la grille avec le bounding box monde
-    bpy.context.view_layer.update()
-    
-    # Utiliser le bounding box monde (prend en compte l'échelle et la rotation)
-    # Multiplier manuellement la matrice monde avec chaque vertex
-    world_bbox = []
-    for v in obj.bound_box:
-        # Appliquer la transformation monde : m @ co + w
-        m = obj.matrix_world
-        world_bbox.append((
-            m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2] + m[0][3],
-            m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2] + m[1][3],
-            m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2] + m[2][3]
-        ))
-    
-    x_min = min(c[0] for c in world_bbox)
-    x_max = max(c[0] for c in world_bbox)
-    y_min = min(c[1] for c in world_bbox)
-    y_max = max(c[1] for c in world_bbox)
-    
-    x_size = x_max - x_min
-    y_size = y_max - y_min
-    max_size = max(x_size, y_size)
     
     # Créer ou récupérer la caméra
     camera = scene.camera
