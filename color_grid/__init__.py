@@ -478,8 +478,8 @@ def _frame_selected_object(obj):
     height = max_size * 1.5
     camera.location = (center.x, center.y, center.z + height)
     
-    # Pointe vers le bas - utiliser rotation euler
-    camera.rotation_euler = (1.5708, 0.0, 0.0)
+    # Rotation à 0,0,0 - la caméra pointe déjà vers le bas par défaut
+    camera.rotation_euler = (0.0, 0.0, 0.0)
     
     # Ajuster le champ de vision
     camera.data.lens = 35
