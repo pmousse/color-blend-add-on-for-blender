@@ -484,9 +484,9 @@ def _frame_selected_object(obj):
     fov_y = 2 * math.atan(sensor_height / (2 * focal_length))
     
     # Calculer la hauteur nécessaire pour cadrer le plus grand côté
-    # Avec une marge de 15%
+    # Avec une marge de 20%
     half_size = max_size / 2
-    margin = 1.15  # 15% de marge
+    margin = 1.20  # 20% de marge
     height = (half_size * margin) / math.tan(fov_y / 2)
     
     # Positionner la caméra directement au-dessus du centre
