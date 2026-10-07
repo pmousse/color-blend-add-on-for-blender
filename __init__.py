@@ -448,8 +448,7 @@ def _frame_selected_object(obj):
     """Placer la caméra au-dessus de l'objet et regarder vers le bas"""
     scene = bpy.context.scene
     
-    # Obtenir les dimensions de l'objet
-    obj.update_from_shape_keys()
+    # Obtenir le centre de l'objet
     center = obj.location
     
     # Calculer la taille de la grille avec le bounding box monde
