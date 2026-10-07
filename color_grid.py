@@ -476,18 +476,18 @@ def _frame_selected_object(obj):
         camera = cam_obj
     
     # Calculer la distance optimale pour cadrer la grille
-    # Formule: distance = (half_size) / tan(fov/2)
-    # fov en radians = 2 * atan(sensor_width / (2 * focal_length))
-    sensor_width = camera.data.sensor_width  # 32mm par défaut
-    focal_length = camera.data.lens  # mm
+    # Utiliser le champ de vision vertical (le plus restrictif)
+    sensor_height = camera.data.sensor_height
+    focal_length = camera.data.lens
     
-    # Champ de vision horizontal
-    fov = 2 * math.atan(sensor_width / (2 * focal_length))
+    # Champ de vision vertical
+    fov_y = 2 * math.atan(sensor_height / (2 * focal_length))
     
-    # Distance pour cadrer avec une marge de 20%
+    # Calculer la hauteur nécessaire pour cadrer le plus grand côté
+    # Avec une marge de 15%
     half_size = max_size / 2
-    margin = 1.2  # 20% de marge
-    height = (half_size * margin) / math.tan(fov / 2)
+    margin = 1.15  # 15% de marge
+    height = (half_size * margin) / math.tan(fov_y / 2)
     
     # Positionner la caméra directement au-dessus du centre
     camera.location = (center.x, center.y, center.z + height)
