@@ -450,10 +450,10 @@ def _frame_selected_object(obj, cols, rows, spacing):
     scene = bpy.context.scene
     
     # Calculer la taille de la grille directement à partir des paramètres
-    total_width = (cols - 1) * spacing
-    total_height = (rows - 1) * spacing
-    x_size = total_width + spacing  # Ajouter un spacing pour les demi-tuiles aux bords
-    y_size = total_height + spacing
+    # Chaque tuile a une taille = spacing, et elles sont espacées de spacing
+    # Taille totale = nombre * spacing (car les tuiles se touchent)
+    x_size = cols * spacing
+    y_size = rows * spacing
     max_size = max(x_size, y_size)
     
     # Obtenir le centre de l'objet
