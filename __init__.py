@@ -449,12 +449,21 @@ def _frame_selected_object(obj):
     scene = bpy.context.scene
     
     # Obtenir les dimensions de l'objet
-    obj_bbox = obj.bound_box
+    obj.update_from_shape_keys()
     center = obj.location
     
-    # Calculer la taille de la grille
-    x_size = abs(obj_bbox[6].x - obj_bbox[0].x)
-    y_size = abs(obj_bbox[6].y - obj_bbox[0].y)
+    # Calculer la taille de la grille avec le bounding box monde
+    bpy.context.view_layer.update()
+    world_bbox = obj.bound_box
+    coords = [v[:] for v in world_bbox]  # Convertir en tuples
+    
+    x_min = min(c[0] for c in coords)
+    x_max = max(c[0] for c in coords)
+    y_min = min(c[1] for c in coords)
+    y_max = max(c[1] for c in coords)
+    
+    x_size = x_max - x_min
+    y_size = y_max - y_min
     max_size = max(x_size, y_size)
     
     # Créer ou récupérer la caméra
@@ -471,7 +480,6 @@ def _frame_selected_object(obj):
     camera.location = (center.x, center.y, center.z + height)
     
     # Pointe vers le bas - utiliser rotation euler
-    # X=90° (1.5708 rad) pour regarder vers le bas selon l'axe Z
     camera.rotation_euler = (1.5708, 0.0, 0.0)
     
     # Ajuster le champ de vision
