@@ -444,7 +444,6 @@ def _frame_selected_object(obj):
     scene = bpy.context.scene
     
     # Obtenir les dimensions de l'objet
-    obj.update_from_shape_keys()
     obj_bbox = obj.bound_box
     center = obj.location
     
@@ -462,16 +461,17 @@ def _frame_selected_object(obj):
         scene.camera = cam_obj
         camera = cam_obj
     
-    # Positionner la caméra au-dessus (vue top-down)
-    height = max_size * 1.2  # Hauteur avec marge
+    # Positionner la caméra directement au-dessus (axe Z positif)
+    height = max_size * 1.5  # Hauteur avec marge
     camera.location = (center.x, center.y, center.z + height)
     
-    # Faire regarder la caméra vers le bas (vers le centre)
-    rotation_x = -90.0 * (3.14159265359 / 180.0)  # -90 degrés en radians
-    camera.rotation_euler = (rotation_x, 0.0, 0.0)
+    # Faire regarder la caméra droit vers le bas (axe Z négatif)
+    camera.rotation_euler = (-1.5708, 0.0, 0.0)  # -90 degrés en radians
     
-    # Ajuster le champ de vision
-    camera.data.lens = 50  # Angle de vue
+    # Ajuster le champ de vision pour tout englober
+    camera.data.lens = 35  # Grand angle pour voir toute la grille
+    
+    print(f"📷 Caméra top-down placée (hauteur: {height:.2f}m, centre: {center.x:.2f}, {center.y:.2f})")
     
     print(f"📷 Caméra placée au-dessus de la grille (hauteur: {height:.2f}m)")
 
