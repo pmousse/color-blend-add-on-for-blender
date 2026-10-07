@@ -428,8 +428,42 @@ class COLORGRID_OT_generate_grid(Operator):
         
         print(f"✅ Grille créée avec succès: {len(faces)} tuiles dans 1 objet")
         
+        # Ajuster la caméra pour englober toute la grille
+        _frame_selected_object(obj)
+        
         self.report({'INFO'}, f"Grille générée : {cols}x{rows} ({cols * rows} éléments)")
         return {'FINISHED'}
+
+
+# ============================================================================
+# FONCTIONS UTILITAIRES
+# ============================================================================
+
+def _frame_selected_object(obj):
+    """Ajuster la caméra pour cadrer l'objet sélectionné"""
+    scene = bpy.context.scene
+    camera = scene.camera
+    
+    if not camera:
+        # Créer une caméra si elle n'existe pas
+        cam_data = bpy.data.cameras.new("Camera")
+        cam_obj = bpy.data.objects.new("Camera", cam_data)
+        scene.collection.objects.link(cam_obj)
+        scene.camera = cam_obj
+        camera = cam_obj
+    
+    # Sélectionner l'objet
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    
+    # Deselect all others
+    for o in bpy.context.scene.collection.objects:
+        if o != obj:
+            o.select_set(False)
+    
+    # Framing
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.view3d.frame_selected(all=False)
 
 
 # ============================================================================
