@@ -465,9 +465,6 @@ def _frame_selected_object(obj):
         scene.collection.objects.link(cam_obj)
         scene.camera = cam_obj
         camera = cam_obj
-        print("📷 Nouvelle caméra créée")
-    else:
-        print("📷 Caméra existante déplacée")
     
     # Positionner la caméra directement au-dessus (axe Z positif)
     height = max_size * 1.5
@@ -479,8 +476,20 @@ def _frame_selected_object(obj):
     # Ajuster le champ de vision
     camera.data.lens = 35
     
-    print(f"📷 Position: {camera.location.x:.2f}, {camera.location.y:.2f}, {camera.location.z:.2f}")
-    print(f"📷 Rotation: {camera.rotation_euler[0]:.2f}, {camera.rotation_euler[1]:.2f}, {camera.rotation_euler[2]:.2f}")
+    # Activer la vue caméra dans le viewport courant
+    for area in bpy.context.screen.areas:
+        if area.type == 'VIEW_3D':
+            for space in area.spaces:
+                if space.type == 'VIEW_3D':
+                    space.shading.type = 'MATERIAL'
+                    # Basculer en vue caméra si pas déjà
+                    if space.region_3d.view_perspective != 'CAMERA':
+                        space.region_3d.view_perspective = 'CAMERA'
+                    break
+            
+            area.tag_redraw()
+    
+    print(f"📷 Caméra positionnée en top-down")
     
     print(f"📷 Caméra placée au-dessus de la grille (hauteur: {height:.2f}m)")
 
