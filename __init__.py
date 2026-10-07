@@ -466,30 +466,31 @@ def _frame_selected_object(obj):
         scene.camera = cam_obj
         camera = cam_obj
     
-    # Positionner la caméra directement au-dessus (axe Z positif)
+    # Positionner la caméra directement au-dessus du centre
     height = max_size * 1.5
     camera.location = (center.x, center.y, center.z + height)
     
-    # Faire regarder la caméra droit vers le bas
-    camera.rotation_euler = (-1.5708, 0.0, 0.0)
+    # Pointe vers le bas - utiliser rotation euler
+    # X=90° (1.5708 rad) pour regarder vers le bas selon l'axe Z
+    camera.rotation_euler = (1.5708, 0.0, 0.0)
     
     # Ajuster le champ de vision
     camera.data.lens = 35
     
-    # Activer la vue caméra dans le viewport courant
+    # Forcer le recalcul des bornes
+    obj.data.update()
+    
+    # Basculer le viewport en vue caméra
     for area in bpy.context.screen.areas:
         if area.type == 'VIEW_3D':
             for space in area.spaces:
                 if space.type == 'VIEW_3D':
-                    space.shading.type = 'MATERIAL'
-                    # Basculer en vue caméra si pas déjà
                     if space.region_3d.view_perspective != 'CAMERA':
                         space.region_3d.view_perspective = 'CAMERA'
-                    break
-            
             area.tag_redraw()
+            break
     
-    print(f"📷 Caméra positionnée en top-down")
+    print(f"📷 Caméra top-down: pos={camera.location}, rot={camera.rotation_euler}")
     
     print(f"📷 Caméra placée au-dessus de la grille (hauteur: {height:.2f}m)")
 
