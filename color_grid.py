@@ -456,14 +456,21 @@ def _frame_selected_object(obj):
     bpy.context.view_layer.update()
     
     # Utiliser le bounding box monde (prend en compte l'échelle et la rotation)
-    # Convertir les bpy_prop_array en tuples avant multiplication
-    world_bbox = [obj.matrix_world @ tuple(v) for v in obj.bound_box]
-    coords = [v[:] for v in world_bbox]  # Convertir en tuples
+    # Multiplier manuellement la matrice monde avec chaque vertex
+    world_bbox = []
+    for v in obj.bound_box:
+        # Appliquer la transformation monde : m @ co + w
+        m = obj.matrix_world
+        world_bbox.append((
+            m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2] + m[0][3],
+            m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2] + m[1][3],
+            m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2] + m[2][3]
+        ))
     
-    x_min = min(c[0] for c in coords)
-    x_max = max(c[0] for c in coords)
-    y_min = min(c[1] for c in coords)
-    y_max = max(c[1] for c in coords)
+    x_min = min(c[0] for c in world_bbox)
+    x_max = max(c[0] for c in world_bbox)
+    y_min = min(c[1] for c in world_bbox)
+    y_max = max(c[1] for c in world_bbox)
     
     x_size = x_max - x_min
     y_size = y_max - y_min
