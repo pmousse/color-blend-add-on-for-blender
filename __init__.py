@@ -454,7 +454,9 @@ def _frame_selected_object(obj):
     
     # Calculer la taille de la grille avec le bounding box monde
     bpy.context.view_layer.update()
-    world_bbox = obj.bound_box
+    
+    # Utiliser le bounding box monde (prend en compte l'échelle et la rotation)
+    world_bbox = [obj.matrix_world @ v for v in obj.bound_box]
     coords = [v[:] for v in world_bbox]  # Convertir en tuples
     
     x_min = min(c[0] for c in coords)
