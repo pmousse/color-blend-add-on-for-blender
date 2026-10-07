@@ -364,8 +364,9 @@ class COLORGRID_OT_generate_grid(Operator):
                 x = start_x + col * props.spacing
                 y = start_y - row * props.spacing
                 
-                # 4 coins de la tuile (vertices)
-                half = props.spacing / 2.0
+                # 4 coins de la tuile (avec espace entre les tuiles)
+                tile_size = props.spacing * 0.9  # 90% du spacing pour laisser 10% d'espace
+                half = tile_size / 2.0
                 v0 = (x - half, y - half, 0)  # bas gauche
                 v1 = (x + half, y - half, 0)  # bas droite
                 v2 = (x + half, y + half, 0)  # haut droite
