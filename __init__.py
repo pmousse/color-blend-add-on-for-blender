@@ -12,6 +12,7 @@ bl_info = {
 import bpy
 import json
 import os
+import math
 from bpy.types import Operator, Panel, PropertyGroup
 from bpy.props import StringProperty, IntProperty, FloatProperty, FloatVectorProperty
 from bpy_extras.io_utils import ExportHelper
@@ -474,15 +475,25 @@ def _frame_selected_object(obj):
         scene.camera = cam_obj
         camera = cam_obj
     
+    # Calculer la distance optimale pour cadrer la grille
+    # Formule: distance = (half_size) / tan(fov/2)
+    # fov en radians = 2 * atan(sensor_width / (2 * focal_length))
+    sensor_width = camera.data.sensor_width  # 32mm par défaut
+    focal_length = camera.data.lens  # mm
+    
+    # Champ de vision horizontal
+    fov = 2 * math.atan(sensor_width / (2 * focal_length))
+    
+    # Distance pour cadrer avec une marge de 20%
+    half_size = max_size / 2
+    margin = 1.2  # 20% de marge
+    height = (half_size * margin) / math.tan(fov / 2)
+    
     # Positionner la caméra directement au-dessus du centre
-    height = max_size * 1.5
     camera.location = (center.x, center.y, center.z + height)
     
     # Rotation à 0,0,0 - la caméra pointe déjà vers le bas par défaut
     camera.rotation_euler = (0.0, 0.0, 0.0)
-    
-    # Ajuster le champ de vision
-    camera.data.lens = 35
     
     # Forcer le recalcul des bornes
     obj.data.update()
